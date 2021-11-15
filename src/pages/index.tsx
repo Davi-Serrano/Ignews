@@ -1,5 +1,8 @@
+import styles from "../styles/home.module.scss"
+
 export default function Home() {
   return (
-    <h1>Hellow Word</h1>
+    <h1 className={styles.titles}>
+      Hellow <span>Word</span> </h1>
   )
 }
