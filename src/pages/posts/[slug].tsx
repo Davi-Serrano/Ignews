@@ -55,7 +55,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, params})=>{
 
     const post = {
         slug,
-        title: response.uid,
+        title: response.slugs,
         content: RichText.asHtml(response.data.content),
         updatedAt: new Date(response.last_publication_date).toLocaleDateString('pt-BR',{
             day: '2-digit',
@@ -68,6 +68,5 @@ export const getServerSideProps: GetServerSideProps = async ({req, params})=>{
         props: {
             post
         },
-        redirect: 60 * 30  //30min
     }
 }
