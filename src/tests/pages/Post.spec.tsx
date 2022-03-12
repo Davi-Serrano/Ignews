@@ -2,6 +2,7 @@ import {render, screen } from "@testing-library/react"
 import Post, { getServerSideProps } from "../../pages/posts/[slug]"
 import { mocked } from "ts-jest/utils"
 import { getPrismicClient } from "../../services/prismic"
+import { getSession } from "next-auth/client"
 
 
 const post = {
@@ -12,6 +13,7 @@ const post = {
 }
 
 jest.mock("../../services/prismic")
+jest.mock("next-auth/client")
 
 
 describe("Post Page", ()=>{
@@ -22,40 +24,23 @@ describe("Post Page", ()=>{
         expect(screen.getByText("Post excerpt")).toBeInTheDocument
     })
 
-    // it("loads initial data", async ()=>{
-    //     const getPrismicClientMocked = mocked(getPrismicClient)
+    it("redirects user if no subscription is found", async ()=>{
+        const getSessionMocked = mocked(getSession)
 
-    //     getPrismicClientMocked.mockReturnValueOnce({
-    //         query: jest.fn().mockResolvedValueOnce({
-    //             results: [
-    //                 {
-    //                     uid: "my-new-post",
-    //                     data: {
-    //                         title: "",
-    //                         content: [
-    //                             {type: "paragraph", text: "Post excerpt"}
-    //                         ],
-    //                     },
-    //                     last_publication_date: "04-01-2021"
-    //                 }
-    //             ]
-    //         })
-    //     } as any)
-
+        getSessionMocked.mockResolvedValueOnce(null)
         
-    //     const response = await getStaticProps({})
+        const response = await getServerSideProps({
+            params:{
+                slug: "my-new-post",
+            },
+        } as any)
 
-    //     expect(response).toEqual(
-    //         expect.objectContaining({
-    //             props: {
-    //                 posts: [{
-    //                     slug: "my-new-post",
-    //                     title: "my-new-post",
-    //                     excerpt: "Post excerpt",
-    //                     updatedAt: "01 de abril de 2021"
-    //                 }]
-    //             }
-    //         })
-    //     )
-    // })
+        expect(response).toEqual(
+            expect.objectContaining({
+               redirect: expect.objectContaining({
+                    destination: "/"  
+               })
+            })
+        )
+    })
 })
